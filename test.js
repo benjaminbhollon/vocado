@@ -5,8 +5,9 @@ const vocado = require('./index.js');
 const app = vocado();
 
 app.all('/', async (request, response) => {
-  response.status(200);
-  response.send('Hello, world!');
+  response
+    .status(200)
+    .html('<p>Hello? World?</p>');
 });
 
 app.listen(80, () => {

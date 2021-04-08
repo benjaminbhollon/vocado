@@ -66,24 +66,50 @@ class Vocado {
     });
     return true;
   }
+  // Static and directory
+  // Handle requests
   handleRequest(request, response) {
-    const res = {
+    let req = {
+      path: request.url,
+      method: request.method,
+      headers: request.headers
+    };
+    let res = {
       status: (code) => {
         if (typeof code !== 'number') throw code + " is not a valid status code.";
 
-        response.writeHead(parseInt(code));
+        response.statusCode = parseInt(code);
+        return res;
       },
-      send: (message) => {
+      send: (message, end = true) => {
+        response.write(message);
+        if (end) response.end();
+        return res;
+      },
+      end: (message) => {
         response.end(message);
-      }
+        return res;
+      },
+      html: (html, end = true) => {
+        response.setHeader('Content-Type', 'text/html');
+        res.send(html, end);
+      },
+      json: (json, end = true) => {
+        response.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(json), end);
+      },
     }
+    //console.log(Object.keys(request));
 
     const queue = this.routes.filter(
-      (route) => matchRoute(route, request.url) && (!route.method || route.method === request.method.toUpperCase())
+      (route) => matchRoute(route.match, request.url) && (!route.method || route.method === request.method.toUpperCase())
     );
 
+    if (!queue.length) {
+      return response.end(`Cannot ${req.method} ${req.path}`)
+    }
+
     queue.forEach((q) => {
-      const req = {};
       q.callback(req, res);
     });
   }
