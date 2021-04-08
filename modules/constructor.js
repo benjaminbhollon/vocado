@@ -69,34 +69,40 @@ class Vocado {
   // Static and directory
   // Handle requests
   handleRequest(request, response) {
+    let finished = false;
     let req = {
       path: request.url,
       method: request.method,
       headers: request.headers
     };
     let res = {
+      set: (field, value) => {
+        response.setHeader(field, value);
+        return res;
+      },
       status: (code) => {
         if (typeof code !== 'number') throw code + " is not a valid status code.";
 
         response.statusCode = parseInt(code);
         return res;
       },
-      send: (message, end = true) => {
-        response.write(message);
-        if (end) response.end();
-        return res;
-      },
       end: (message) => {
         response.end(message);
+        finished = true;
+        return res;
+      },
+      send: (message, end = true) => {
+        response.write(message);
+        if (end) res.end();
         return res;
       },
       html: (html, end = true) => {
         response.setHeader('Content-Type', 'text/html');
-        res.send(html, end);
+        return res.send(html, end);
       },
       json: (json, end = true) => {
         response.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(json), end);
+        return res.send(JSON.stringify(json), end);
       },
     }
     //console.log(Object.keys(request));
@@ -110,7 +116,7 @@ class Vocado {
     }
 
     queue.forEach((q) => {
-      q.callback(req, res);
+      if (!finished) q.callback(req, res);
     });
   }
   // Listen on port
