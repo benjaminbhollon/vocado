@@ -1,6 +1,8 @@
 'use strict';
 const http = require('http');
 const url = require('url');
+const fs = require('fs');
+const path = require('path');
 const querystring = require('querystring');
 const matchRoute = require('./matchRoute');
 
@@ -81,6 +83,26 @@ class Vocado {
     });
   }
   // Static and directory
+  static(root, options = {mount: '/', index: 'index.html'}) {
+    this.use(options.mount, async (request, response) => {
+      const searchAt = path.join(
+        require.main.path,
+        root,
+        request.path,
+        (request.path.slice(-1) === '/' ? 'index.html' : '')
+      );
+      let data;
+      try {
+        data = fs.readFileSync(
+          searchAt,
+          {encoding: 'utf8', flag: 'r'}
+        )
+      } catch (err) {
+        data = undefined;
+      }
+      if (typeof data !== 'undefined') response.send(data);
+    });
+  };
   // Handle requests
   handleRequest(request, response) {
     let requestBody = [];
