@@ -88,9 +88,10 @@ class Vocado {
       const searchAt = path.join(
         require.main.path,
         root,
-        request.path,
+        request.path.slice(options.mount.length),
         (request.path.slice(-1) === '/' ? 'index.html' : '')
       );
+        console.log(searchAt);
       let data;
       try {
         data = fs.readFileSync(

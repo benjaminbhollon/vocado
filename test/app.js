@@ -4,7 +4,7 @@ const vocado = require('../index.js');
 
 const app = vocado();
 
-app.static('./static/');
+app.static('./static/', {mount: '/static/'});
 
 app.get('/', async (request, response) => {
   response
