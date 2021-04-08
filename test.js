@@ -4,7 +4,7 @@ const vocado = require('./index.js');
 
 const app = vocado();
 
-app.get('/', async (request, response) => {
+app.post('/', async (request, response) => {
   response
     .html('<p>Hello, world? Are you there?</p>');
 });
