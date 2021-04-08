@@ -4,10 +4,13 @@ const vocado = require('./index.js');
 
 const app = vocado();
 
+app.use('/app/', (request, response, next) => {
+  console.log(request.method + " " + request.path);
+});
+
 app.get('/', async (request, response) => {
   response
     .html('<p>Hello, world? Are you there?</p>');
-  console.log(request.hostname);
 });
 
 app.listen(80, () => {

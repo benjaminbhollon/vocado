@@ -68,6 +68,18 @@ class Vocado {
     });
     return true;
   }
+  //Middleware
+  use(route, callback) {
+    if (typeof callback === "undefined") {
+      callback = route;
+      route = '/';
+    }
+
+    this.routes.push({
+      match: route + "*",
+      callback
+    });
+  }
   // Static and directory
   // Handle requests
   handleRequest(request, response) {
@@ -82,6 +94,7 @@ class Vocado {
         path: url.parse(request.url).pathname,
         originalURL: request.url,
         hostname: request.headers.host,
+        subdomains: request.headers.host.split('.').slice(0, -2),
         method: request.method,
         headers: request.headers,
         app: this,
@@ -135,7 +148,10 @@ class Vocado {
       }
 
       queue.forEach((q) => {
-        if (!finished) q.callback(req, res);
+        if (!finished) q.callback(req, res, () => {
+          console.warn("WARNING: Vocado doesn't use the next() function the way express does.\nVocado just keeps going through the queue until headers are sent. next() may be implemented in a later update to allow the queue to continue regardless of headers.");
+          return false;
+        });
       });
     });
   }
