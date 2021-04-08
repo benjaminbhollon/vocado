@@ -112,6 +112,7 @@ class Vocado {
     );
 
     if (!queue.length) {
+      response.writeHead(404);
       return response.end(`Cannot ${req.method} ${req.path}`)
     }
 
