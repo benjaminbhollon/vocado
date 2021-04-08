@@ -7,7 +7,7 @@ const app = vocado();
 app.get('/', async (request, response) => {
   response
     .html('<p>Hello, world? Are you there?</p>');
-  console.log(request.cookies);
+  console.log(request.hostname);
 });
 
 app.listen(80, () => {

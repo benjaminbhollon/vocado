@@ -81,12 +81,13 @@ class Vocado {
       let req = {
         path: url.parse(request.url).pathname,
         originalURL: request.url,
+        hostname: request.headers.host,
         method: request.method,
         headers: request.headers,
         app: this,
         query: JSON.parse(JSON.stringify(url.parse(request.url, true).query)),
         body: requestBody,
-        cookies: JSON.parse(JSON.stringify(querystring.parse(request.headers.cookie))),
+        cookies: JSON.parse(JSON.stringify(querystring.parse(request.headers.cookie ? request.headers.cookie : ''))),
       };
       let res = {
         set: (field, value) => {
@@ -118,7 +119,7 @@ class Vocado {
           return res.send(JSON.stringify(json), end);
         },
       };
-      //console.log(Object.keys(request.headers));
+      //console.log(Object.keys(request));
 
       const queue = this.routes.filter(
         (route) => matchRoute(
