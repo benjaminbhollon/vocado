@@ -1,6 +1,7 @@
 'use strict';
 const http = require('http');
 const url = require('url');
+const querystring = require('querystring');
 const matchRoute = require('./matchRoute');
 
 class Vocado {
@@ -79,11 +80,13 @@ class Vocado {
       let finished = false;
       let req = {
         path: url.parse(request.url).pathname,
+        originalURL: request.url,
         method: request.method,
         headers: request.headers,
         app: this,
         query: JSON.parse(JSON.stringify(url.parse(request.url, true).query)),
-        body: requestBody
+        body: requestBody,
+        cookies: JSON.parse(JSON.stringify(querystring.parse(request.headers.cookie))),
       };
       let res = {
         set: (field, value) => {
@@ -115,7 +118,7 @@ class Vocado {
           return res.send(JSON.stringify(json), end);
         },
       };
-      //console.log(Object.keys(request));
+      //console.log(Object.keys(request.headers));
 
       const queue = this.routes.filter(
         (route) => matchRoute(

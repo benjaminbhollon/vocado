@@ -4,9 +4,10 @@ const vocado = require('./index.js');
 
 const app = vocado();
 
-app.post('/', async (request, response) => {
+app.get('/', async (request, response) => {
   response
     .html('<p>Hello, world? Are you there?</p>');
+  console.log(request.cookies);
 });
 
 app.listen(80, () => {
