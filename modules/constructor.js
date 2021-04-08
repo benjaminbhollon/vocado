@@ -67,12 +67,25 @@ class Vocado {
     return true;
   }
   handleRequest(request, response) {
+    const res = {
+      status: (code) => {
+        if (typeof code !== 'number') throw code + " is not a valid status code.";
+
+        response.writeHead(parseInt(code));
+      },
+      send: (message) => {
+        response.end(message);
+      }
+    }
+
     const queue = this.routes.filter(
       (route) => matchRoute(route, request.url) && (!route.method || route.method === request.method.toUpperCase())
     );
-    console.log(queue);
-    response.writeHead(200);
-    response.end('Hello, world!');
+
+    queue.forEach((q) => {
+      const req = {};
+      q.callback(req, res);
+    });
   }
   // Listen on port
   listen(port, callback) {
