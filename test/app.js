@@ -6,7 +6,7 @@ const app = vocado();
 
 app.templates('pug', './templates/');
 
-app.static('./static/', {mount: '/static/'});
+app.static('./static/');
 
 app.get('/', async (request, response) => {
   response

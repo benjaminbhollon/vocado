@@ -103,6 +103,7 @@ class Vocado {
   // Static and directory
   static(root, options = {mount: '/', index: 'index.html'}) {
     this.use(options.mount, async (request, response, next) => {
+      if (request.method.toUpperCase() !== 'GET') return next();
       const searchAt = path.join(
         require.main.path,
         root,
@@ -110,16 +111,9 @@ class Vocado {
         (request.path.slice(-1) === '/' ? 'index.html' : '')
       );
       let data;
-      try {
-        data = fs.readFileSync(
-          searchAt,
-          {encoding: 'utf8', flag: 'r'}
-        )
-      } catch (err) {
-        data = undefined;
-      }
-      if (typeof data !== 'undefined') response.send(data);
-      else next();
+      const stream = fs.createReadStream(searchAt);
+      stream.on('error', next);
+      stream.pipe(response.originalResponse);
     });
   }
   // Handle requests
@@ -211,7 +205,8 @@ class Vocado {
 
           if (callback) callback();
           return res.html(final);
-        }
+        },
+        originalResponse: response,
       };
       let q = -1;
       function next() {
