@@ -207,6 +207,18 @@ class Vocado {
           return res.html(final);
         },
         originalResponse: response,
+        cookies: (name, value, options = {}) => {
+          //response.append('');
+        },
+        redirect: (status, destination) => {
+          let code = 302;
+          if (typeof destination === 'undefined') {
+            destination = status;
+          } else {
+            code = status;
+          }
+          return res.set('Location', destination).status(code).end();
+        }
       };
       let q = -1;
       function next() {

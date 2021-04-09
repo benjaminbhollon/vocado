@@ -10,7 +10,11 @@ app.static('./static/');
 
 app.get('/', async (request, response) => {
   response
-    .render('index.pug');
+    .render('index.pug', {cookies: request.cookies});
+});
+
+app.get('/redirect/', async (request, response) => {
+  response.redirect('../');
 });
 
 app.listen(port, () => {
