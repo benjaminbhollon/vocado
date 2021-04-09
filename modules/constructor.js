@@ -102,7 +102,7 @@ class Vocado {
   }
   // Static and directory
   static(root, options = {mount: '/', index: 'index.html'}) {
-    this.use(options.mount, async (request, response) => {
+    this.use(options.mount, async (request, response, next) => {
       const searchAt = path.join(
         require.main.path,
         root,
@@ -119,6 +119,7 @@ class Vocado {
         data = undefined;
       }
       if (typeof data !== 'undefined') response.send(data);
+      else next();
     });
   }
   // Handle requests
@@ -216,6 +217,9 @@ class Vocado {
       function next() {
         q += 1;
         if (queue[q]) queue[q].callback(req, res, next);
+        else {
+          res.status(404).end('Cannot ' + req.method + ' ' + req.path);
+        }
       }
       //console.log(Object.keys(request));
 
@@ -224,13 +228,6 @@ class Vocado {
         return response.end(`Cannot ${req.method} ${req.path}`)
       }
       next();
-
-      /*queue.forEach((q) => {
-        if (!finished) q.callback(req, res, () => {
-          console.warn("WARNING: Vocado doesn't use the next() function the way express does.\nVocado just keeps going through the queue until headers are sent. next() may be implemented in a later update to allow the queue to continue regardless of headers.");
-          return false;
-        });
-      });*/
     });
   }
   // Listen on port
