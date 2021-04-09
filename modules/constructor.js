@@ -127,7 +127,13 @@ class Vocado {
     });
     request.on('end', () => {
       if (Buffer.concat(requestBody).toString()) requestBody = JSON.parse(Buffer.concat(requestBody).toString());
-      let finished = false;
+      const queue = this.routes.filter(
+        (route) => matchRoute(
+            route.match,
+            url.parse(request.url).pathname
+          ) &&
+          (!route.method || route.method === request.method.toUpperCase())
+      );
       let req = {
         path: url.parse(request.url).pathname,
         originalURL: request.url,
@@ -153,7 +159,6 @@ class Vocado {
         },
         end: (message) => {
           response.end(message);
-          finished = true;
           return res;
         },
         send: (message, end = true) => {
@@ -198,27 +203,25 @@ class Vocado {
           return res.html(final);
         }
       };
+      let q = -1;
+      function next() {
+        q += 1;
+        if (queue[q]) queue[q].callback(req, res, next);
+      }
       //console.log(Object.keys(request));
-
-      const queue = this.routes.filter(
-        (route) => matchRoute(
-            route.match,
-            url.parse(request.url).pathname
-          ) &&
-          (!route.method || route.method === request.method.toUpperCase())
-      );
 
       if (!queue.length) {
         response.writeHead(404);
         return response.end(`Cannot ${req.method} ${req.path}`)
       }
+      next();
 
-      queue.forEach((q) => {
+      /*queue.forEach((q) => {
         if (!finished) q.callback(req, res, () => {
           console.warn("WARNING: Vocado doesn't use the next() function the way express does.\nVocado just keeps going through the queue until headers are sent. next() may be implemented in a later update to allow the queue to continue regardless of headers.");
           return false;
         });
-      });
+      });*/
     });
   }
   // Listen on port
