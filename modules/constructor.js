@@ -148,6 +148,19 @@ class Vocado {
           response.setHeader(field, value);
           return res;
         },
+        get: (field) => {
+          return response.getHeader(field);
+        },
+        append: (field, value) => {
+          let current = res.get(field);
+          let newValue = value;
+          if (current) {
+            newValue = Array.isArray(current) ? current.concat(newValue)
+              : Array.isArray(newValue) ? [current].concat(newValue)
+              : [current, newValue];;
+          }
+          return res.set(field, newValue);
+        },
         status: (code) => {
           if (typeof code !== 'number') throw code + " is not a valid status code.";
 
@@ -207,8 +220,14 @@ class Vocado {
           return res.html(final);
         },
         originalResponse: response,
-        cookies: (name, value, options = {}) => {
-          //response.append('');
+        cookie: (name, value, options = {}) => {
+          value = typeof value === 'object'
+            ? 'j:' + JSON.stringify(value)
+            : String(value);
+            console.log(value);
+          let finalCookie = {};
+          finalCookie[name] = value;
+          return res.append('Set-Cookie', [querystring.encode(finalCookie) + "; path=" + (options.path ? options.path : '/')]);
         },
         redirect: (status, destination) => {
           let code = 302;

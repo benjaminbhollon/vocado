@@ -13,8 +13,8 @@ app.get('/', async (request, response) => {
     .render('index.pug', {cookies: request.cookies});
 });
 
-app.get('/redirect/', async (request, response) => {
-  response.redirect('../');
+app.get('/cookie/', async (request, response) => {
+  response.cookie('who', 'me').end();//.redirect('../');
 });
 
 app.listen(port, () => {
