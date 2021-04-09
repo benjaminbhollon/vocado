@@ -124,13 +124,19 @@ class Vocado {
     });
     request.on('end', () => {
       if (Buffer.concat(requestBody).toString()) requestBody = JSON.parse(Buffer.concat(requestBody).toString());
-      const queue = this.routes.filter(
-        (route) => matchRoute(
+      const queue = this.routes
+        .map(route => {
+          let r = {...route};
+          const match = matchRoute(
             route.match,
             url.parse(request.url).pathname
-          ) &&
-          (!route.method || route.method === request.method.toUpperCase())
-      );
+          );
+          r.params = match.params;
+          return match.success ? r : false;
+        })
+        .filter(
+          (route) => route !== false
+        );
       let req = {
         path: url.parse(request.url).pathname,
         originalURL: request.url,
@@ -224,7 +230,6 @@ class Vocado {
           value = typeof value === 'object'
             ? 'j:' + JSON.stringify(value)
             : String(value);
-            console.log(value);
           let finalCookie = {};
           finalCookie[name] = value;
           return res.append('Set-Cookie', [querystring.encode(finalCookie) + "; path=" + (options.path ? options.path : '/')]);
@@ -242,6 +247,8 @@ class Vocado {
       let q = -1;
       function next() {
         q += 1;
+        req.params = queue[q].params;
+        //console.log(queue[q]);
         if (queue[q]) queue[q].callback(req, res, next);
         else {
           res.status(404).end('Cannot ' + req.method + ' ' + req.path);
