@@ -1,11 +1,11 @@
-doctype html
-html(lang=en)
-  head
-    title Vocado Engine
-    style.
-      :root {
-        color-scheme: dark;
-      }
-  body
-    h1 Hello, world!
-    p This file rendered from Pug via Vocado.
+extends layout.pug
+
+block head
+  title Vocado Engine
+  style.
+    :root {
+      color-scheme: dark;
+    }
+block body
+  h1 Hello, world!
+  p This file rendered from Pug via Vocado.
