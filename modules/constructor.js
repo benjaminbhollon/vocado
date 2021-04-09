@@ -16,6 +16,8 @@ class Vocado {
         require.main.path,
         './templates/'
       ),
+      shouldCache: process.env.NODE_ENV === 'production',
+      cache: {},
     };
   }
   // Routes
@@ -191,7 +193,14 @@ class Vocado {
             throw new Error(err);
           }
 
-          const compiled = engineCompile(this.template.engine, engine)(raw);
+          let compiled = () => true;
+          if (this.template.cache[templatePath]) {
+            compiled = this.template.cache[templatePath];
+          } else {
+            compiled = engineCompile(this.template.engine, engine)(raw);
+            this.template.cache[templatePath] = compiled;
+          }
+
           let final = "";
           try {
             final = compiled(variables);
