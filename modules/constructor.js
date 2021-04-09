@@ -195,7 +195,7 @@ class Vocado {
           }
 
           let compiled = () => true;
-          if (this.template.cache[templatePath]) {
+          if (this.template.cache[templatePath] && !this.template.shouldCache) {
             compiled = this.template.cache[templatePath];
           } else {
             compiled = engineCompile(this.template.engine, engine)(raw);
