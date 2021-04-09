@@ -5,10 +5,18 @@ const fs = require('fs');
 const path = require('path');
 const querystring = require('querystring');
 const matchRoute = require('./matchRoute');
+const engineCompile = require('./engineCompile');
 
 class Vocado {
   constructor() {
     this.routes = [];
+    this.template = {
+      engine: 'amole',
+      folder: path.join(
+        require.main.path,
+        './templates/'
+      ),
+    };
   }
   // Routes
   all(route, callback) {
@@ -70,7 +78,7 @@ class Vocado {
     });
     return true;
   }
-  //Middleware
+  // Middleware
   use(route, callback) {
     if (typeof callback === "undefined") {
       callback = route;
@@ -82,6 +90,14 @@ class Vocado {
       callback
     });
   }
+  // Templates
+  templates(engine, folder = "./templates/") {
+    this.template.engine = engine;
+    this.template.folder = path.join(
+      require.main.path,
+      folder
+    );
+  }
   // Static and directory
   static(root, options = {mount: '/', index: 'index.html'}) {
     this.use(options.mount, async (request, response) => {
@@ -91,7 +107,6 @@ class Vocado {
         request.path.slice(options.mount.length),
         (request.path.slice(-1) === '/' ? 'index.html' : '')
       );
-        console.log(searchAt);
       let data;
       try {
         data = fs.readFileSync(
@@ -103,7 +118,7 @@ class Vocado {
       }
       if (typeof data !== 'undefined') response.send(data);
     });
-  };
+  }
   // Handle requests
   handleRequest(request, response) {
     let requestBody = [];
@@ -154,6 +169,34 @@ class Vocado {
           response.setHeader('Content-Type', 'application/json');
           return res.send(JSON.stringify(json), end);
         },
+        render: (template = 'index.pug', variables = {}, callback) => {
+          const engine = require(this.template.engine);
+          const templatePath = path.join(
+            this.template.folder,
+            template
+          );
+
+          let raw = '';
+          try {
+            raw = fs.readFileSync(
+              templatePath,
+              {encoding: 'utf8', flag: 'r'}
+            );
+          } catch (err) {
+            throw new Error(err);
+          }
+
+          const compiled = engineCompile(this.template.engine, engine)(raw);
+          let final = "";
+          try {
+            final = compiled(variables);
+          } catch (err) {
+            throw new Error(err);
+          }
+
+          if (callback) callback();
+          return res.html(final);
+        }
       };
       //console.log(Object.keys(request));
 

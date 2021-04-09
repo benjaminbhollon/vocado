@@ -1,16 +1,18 @@
 'use strict';
 
 const vocado = require('../index.js');
-
+const port = 80;
 const app = vocado();
+
+app.templates('pug', './templates/');
 
 app.static('./static/', {mount: '/static/'});
 
 app.get('/', async (request, response) => {
   response
-    .html('<p>Hello, world? Are you there?</p>');
+    .render('index.pug');
 });
 
-app.listen(80, () => {
-  console.log('Serving on port 80.');
+app.listen(port, () => {
+  console.log('Serving on port ' + port + '.');
 });
