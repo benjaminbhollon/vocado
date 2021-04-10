@@ -13,8 +13,8 @@ app.get('/', async (request, response) => {
     .render('index.pug', {cookies: request.cookies});
 });
 
-app.get('/:name/', async (request, response) => {
-  response.end('Hello, ' + request.params.name + '.');
+app.get('/:problem/', async (request, response) => {
+  response.cookie('problem', request.params.problem).end('Hello, ' + request.params.problem + '.');
 });
 
 app.listen(port, () => {
