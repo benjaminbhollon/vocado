@@ -147,11 +147,11 @@ class Vocado {
         app: this,
         query: JSON.parse(JSON.stringify(url.parse(request.url, true).query)),
         body: requestBody,
-        cookies: Object.assign(...
+        cookies: request.headers.cookie ? Object.assign(...
           request.headers.cookie
             .split(';')
             .map(c => JSON.parse(JSON.stringify(querystring.parse(c.trim()))))
-        ),
+        ) : {},
       };
       let res = {
         set: (field, value) => {
