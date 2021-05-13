@@ -12,11 +12,12 @@ class Vocado {
     this.routes = [];
     this.template = {
       engine: 'amole',
+      engineCache: false,
       folder: path.join(
         require.main.path,
         './templates/'
       ),
-      shouldCache: process.env.NODE_ENV === 'production',
+      shouldCache: true || process.env.NODE_ENV === 'production',
       cache: {},
     };
   }
@@ -95,6 +96,7 @@ class Vocado {
   // Templates
   templates(engine, folder = "./templates/") {
     this.template.engine = engine;
+    this.template.engineCache = require(engine);
     this.template.folder = path.join(
       require.main.path,
       folder
@@ -195,7 +197,8 @@ class Vocado {
           return res.send(JSON.stringify(json), end);
         },
         render: (template = 'index.pug', variables = {}, callback) => {
-          const engine = require(this.template.engine);
+          if (!this.template.engineCache) this.template.engineCache = require(this.template.engine);
+          const engine = this.template.engineCache;
           const templatePath = path.join(
             this.template.folder,
             template
