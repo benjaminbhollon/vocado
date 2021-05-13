@@ -17,7 +17,7 @@ class Vocado {
         require.main.path,
         './templates/'
       ),
-      shouldCache: true || process.env.NODE_ENV === 'production',
+      shouldCache: process.env.NODE_ENV === 'production',
       cache: {},
     };
   }
@@ -94,13 +94,14 @@ class Vocado {
     });
   }
   // Templates
-  templates(engine, folder = "./templates/") {
+  templates(engine, folder = "./templates/", shouldCache = (process.env.NODE_ENV === 'production')) {
     this.template.engine = engine;
     this.template.engineCache = require(engine);
     this.template.folder = path.join(
       require.main.path,
       folder
     );
+    this.template.shouldCache = shouldCache;
   }
   // Static and directory
   static(root, options = {mount: '/', index: 'index.html'}) {

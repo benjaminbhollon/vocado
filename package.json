@@ -1,6 +1,6 @@
 {
   "name": "vocado",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "An unopinionated node web framework built to minimize dependencies.",
   "main": "index.js",
   "scripts": {
