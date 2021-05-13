@@ -273,8 +273,8 @@ class Vocado {
   }
   // Listen on port
   listen(port, callback) {
-    const server = http.createServer(this.handleRequest.bind(this));
-    server.listen(port);
+    this.server = http.createServer(this.handleRequest.bind(this));
+    this.server.listen(port);
 
     callback();
   }
