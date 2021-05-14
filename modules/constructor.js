@@ -120,7 +120,7 @@ class Vocado {
     });
   }
   // Handle requests
-  handleRequest(request, response) {
+  #handleRequest(request, response) {
     let requestBody = [];
     request.on('data', (chunks) => {
       requestBody.push(chunks);
@@ -289,7 +289,7 @@ class Vocado {
   }
   // Listen on port
   listen(port, callback) {
-    this.server = http.createServer(this.handleRequest.bind(this));
+    this.server = http.createServer(this.#handleRequest.bind(this));
     this.server.listen(port);
 
     callback();
