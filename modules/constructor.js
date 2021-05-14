@@ -127,7 +127,23 @@ class Vocado {
     });
     request.on('end', () => {
       if (Buffer.concat(requestBody).toString()) requestBody = JSON.parse(Buffer.concat(requestBody).toString());
-      const queue = this.routes
+      let queue = this.routes;
+      for (let item of queue) {
+        if (item.callback instanceof Router) {
+          console.log('Aha!');
+          queue.splice(
+            queue.indexOf(item),
+            1,
+            ...item.callback.routes.map(r => {
+              let newRoute = r;
+              newRoute.match = item.match.slice(0, -2) + newRoute.match;
+              return newRoute;
+            })
+          );
+        }
+      }
+      console.log(queue);
+      queue = queue
         .map(route => {
           let r = {...route};
           const match = matchRoute(
@@ -280,10 +296,89 @@ class Vocado {
   }
 }
 
-function constructVocado() {
-  const app = new Vocado();
+class Router {
+  constructor() {
+    this.routes = [];
+  }
+  all(route, callback) {
+    if (typeof route !== 'string') throw "Invalid route '" + route + "'";
+    if (typeof callback !== 'function') throw "Expected callback to be a function, received " + (typeof callback);
+    this.routes.push({
+      match: route,
+      callback
+    });
+    return true;
+  }
+  get(route, callback) {
+    if (typeof route !== 'string') throw "Invalid route '" + route + "'";
+    if (typeof callback !== 'function') throw "Expected callback to be a function, received " + (typeof callback);
+    this.routes.push({
+      match: route,
+      method: 'GET',
+      callback
+    });
+    return true;
+  }
+  post(route, callback) {
+    if (typeof route !== 'string') throw "Invalid route '" + route + "'";
+    if (typeof callback !== 'function') throw "Expected callback to be a function, received " + (typeof callback);
+    this.routes.push({
+      match: route,
+      method: 'POST',
+      callback
+    });
+    return true;
+  }
+  put(route, callback) {
+    if (typeof route !== 'string') throw "Invalid route '" + route + "'";
+    if (typeof callback !== 'function') throw "Expected callback to be a function, received " + (typeof callback);
+    this.routes.push({
+      match: route,
+      method: 'PUT',
+      callback
+    });
+    return true;
+  }
+  delete(route, callback) {
+    if (typeof route !== 'string') throw "Invalid route '" + route + "'";
+    if (typeof callback !== 'function') throw "Expected callback to be a function, received " + (typeof callback);
+    this.routes.push({
+      match: route,
+      method: 'DELETE',
+      callback
+    });
+    return true;
+  }
+  patch(route, callback) {
+    if (typeof route !== 'string') throw "Invalid route '" + route + "'";
+    if (typeof callback !== 'function') throw "Expected callback to be a function, received " + (typeof callback);
+    this.routes.push({
+      match: route,
+      method: 'PATCH',
+      callback
+    });
+    return true;
+  }
+  // Middleware
+  use(route, callback) {
+    if (typeof callback === "undefined") {
+      callback = route;
+      route = '/';
+    }
 
-  return app;
+    this.routes.push({
+      match: route + "*",
+      callback
+    });
+  }
 }
 
-module.exports = constructVocado;
+exports = module.exports = constructVocado;
+
+function constructVocado() {
+  return new Vocado();
+}
+
+exports.Router = () => {
+  return new Router();
+}

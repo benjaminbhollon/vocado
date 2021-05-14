@@ -13,10 +13,14 @@ app.get('/', async (request, response) => {
     .render('index.pug', {cookies: request.cookies});
 });
 
-app.get('/:problem/', async (request, response) => {
-  response.cookie('problem', request.params.problem).end('Hello, ' + request.params.problem + '.');
-});
-
 app.listen(port, () => {
   console.log('Serving on port ' + port + '.');
 });
+
+const router = vocado.Router();
+
+router.get('/', async (request, response) => {
+  response.end('Hello! I am a router.');
+});
+
+app.use('/router/', router);
