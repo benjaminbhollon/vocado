@@ -272,7 +272,7 @@ class Vocado {
         q += 1;
         if (queue[q]) {
           req.params = queue[q].params;
-          queue[q].callback(req, {...response, ...res}, next);
+          queue[q].callback(req, res, next);
         } else {
           res.status(404).end('Cannot ' + req.method + ' ' + req.path);
         }
