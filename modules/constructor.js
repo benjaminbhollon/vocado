@@ -130,7 +130,6 @@ class Vocado {
       let queue = this.routes;
       for (let item of queue) {
         if (item.callback instanceof Router) {
-          console.log('Aha!');
           queue.splice(
             queue.indexOf(item),
             1,
@@ -142,7 +141,6 @@ class Vocado {
           );
         }
       }
-      console.log(queue);
       queue = queue
         .map(route => {
           let r = {...route};
