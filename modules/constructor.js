@@ -159,7 +159,6 @@ class Vocado {
         originalURL: JSON.parse(JSON.stringify(request.url)),
         hostname: request.headers.host,
         subdomains: request.headers.host.split('.').slice(0, -2),
-        method: request.method,
         headers: request.headers,
         app: this,
         query: JSON.parse(JSON.stringify(url.parse(request.url, true).query)),
