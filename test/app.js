@@ -3,14 +3,18 @@
 const vocado = require('../index.js');
 const port = 800;
 const app = vocado();
-var parseurl = require('parseurl');
 
 app.templates('pug', './templates/');
 
 app.static('./static/');
 
+app.use((request, response, next) => {
+  request.fun = 'Smiley!';
+  next();
+});
+
 app.get('/', async (request, response) => {
-  console.log(parseurl(request));
+  console.log(request.fun);
   response
     .render('index.pug', {cookies: request.cookies});
 });

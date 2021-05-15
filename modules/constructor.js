@@ -155,6 +155,7 @@ class Vocado {
           (route) => route !== false
         );
       let req = {
+        ...request,
         path: url.parse(request.url).pathname,
         originalURL: JSON.parse(JSON.stringify(request.url)),
         hostname: request.headers.host,
@@ -170,6 +171,7 @@ class Vocado {
         ) : {},
       };
       let res = {
+        ...response,
         set: (field, value) => {
           response.setHeader(field, value);
           return res;
@@ -270,7 +272,7 @@ class Vocado {
         q += 1;
         if (queue[q]) {
           req.params = queue[q].params;
-          queue[q].callback({...request, ...req}, {...response, ...res}, next);
+          queue[q].callback(req, {...response, ...res}, next);
         } else {
           res.status(404).end('Cannot ' + req.method + ' ' + req.path);
         }
