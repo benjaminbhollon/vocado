@@ -1,14 +1,16 @@
 'use strict';
 
 const vocado = require('../index.js');
-const port = 80;
+const port = 800;
 const app = vocado();
+var parseurl = require('parseurl');
 
 app.templates('pug', './templates/');
 
 app.static('./static/');
 
 app.get('/', async (request, response) => {
+  console.log(parseurl(request));
   response
     .render('index.pug', {cookies: request.cookies});
 });

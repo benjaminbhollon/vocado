@@ -156,7 +156,7 @@ class Vocado {
         );
       let req = {
         path: url.parse(request.url).pathname,
-        originalURL: request.url,
+        originalURL: JSON.parse(JSON.stringify(request.url)),
         hostname: request.headers.host,
         subdomains: request.headers.host.split('.').slice(0, -2),
         method: request.method,
@@ -271,12 +271,11 @@ class Vocado {
         q += 1;
         if (queue[q]) {
           req.params = queue[q].params;
-          queue[q].callback(req, res, next);
+          queue[q].callback({...request, ...req}, {...response, ...res}, next);
         } else {
           res.status(404).end('Cannot ' + req.method + ' ' + req.path);
         }
       }
-      //console.log(Object.keys(request));
 
       if (!queue.length) {
         response.writeHead(404);
