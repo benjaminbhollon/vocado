@@ -14,7 +14,6 @@ app.use((request, response, next) => {
 });
 
 app.get('/', async (request, response) => {
-  console.log(request.fun);
   response
     .render('index.pug', {cookies: request.cookies});
 });

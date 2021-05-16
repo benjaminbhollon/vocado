@@ -171,7 +171,7 @@ class Vocado {
         ) : {},
       };
       let res = {
-        ...response,
+        _end: response.end,
         set: (field, value) => {
           response.setHeader(field, value);
           return res;
@@ -196,7 +196,7 @@ class Vocado {
           return res;
         },
         end: (message) => {
-          response.end(message);
+          response._end(message);
           return res;
         },
         send: (message, end = true) => {
@@ -267,12 +267,15 @@ class Vocado {
           return res.set('Location', destination).status(code).end();
         }
       };
+
+      Object.assign(response, res);
+
       let q = -1;
       function next() {
         q += 1;
         if (queue[q]) {
           req.params = queue[q].params;
-          queue[q].callback(req, res, next);
+          queue[q].callback(req, response, next);
         } else {
           res.status(404).end('Cannot ' + req.method + ' ' + req.path);
         }
