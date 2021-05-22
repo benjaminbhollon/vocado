@@ -126,7 +126,14 @@ class Vocado {
       requestBody.push(chunks);
     });
     request.on('end', () => {
-      if (Buffer.concat(requestBody).toString()) requestBody = JSON.parse(Buffer.concat(requestBody).toString());
+      if (Buffer.concat(requestBody).toString()) {
+        try {
+          requestBody = JSON.parse(Buffer.concat(requestBody).toString());
+        } catch(err) {
+          requestBody = querystring.parse(Buffer.concat(requestBody).toString());
+        }
+      }
+
       let queue = this.routes;
       for (let item of queue) {
         if (item.callback instanceof Router) {
