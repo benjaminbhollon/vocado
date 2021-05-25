@@ -1,5 +1,4 @@
 'use strict';
-const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
@@ -8,6 +7,7 @@ const matchRoute = require('./matchRoute');
 const engineCompile = require('./engineCompile');
 
 class Vocado {
+  #ssl = false;
   constructor() {
     this.routes = [];
     this.template = {
@@ -118,6 +118,10 @@ class Vocado {
       stream.on('error', next);
       stream.pipe(response.originalResponse);
     });
+  }
+  // SSL
+  ssl(sslOptions = false) {
+    this.#ssl = sslOptions;
   }
   // Handle requests
   #handleRequest(request, response) {
@@ -297,7 +301,8 @@ class Vocado {
   }
   // Listen on port
   listen(port, callback) {
-    this.server = http.createServer(this.#handleRequest.bind(this));
+    const protocol = (this.#ssl === false ? require('http') : require('https'));
+    this.server = protocol.createServer(this.#handleRequest.bind(this));
     this.server.listen(port);
 
     callback();
