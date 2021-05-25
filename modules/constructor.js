@@ -302,10 +302,12 @@ class Vocado {
   // Listen on port
   listen(port, callback) {
     const protocol = (this.#ssl === false ? require('http') : require('https'));
-    this.server = protocol.createServer(this.#handleRequest.bind(this));
+    const options = (this.#ssl ? this.#ssl : {});
+
+    this.server = protocol.createServer(options, this.#handleRequest.bind(this));
     this.server.listen(port);
 
-    callback();
+    if (callback) callback();
   }
 }
 
